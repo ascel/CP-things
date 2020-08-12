@@ -1,54 +1,45 @@
-const int size = 1e5;
+int MAXN, n;
+vector<int> segtree;
 
-int n;
-int arr[size], seg[size << 2];
-
-void build(int idx = 0, int l = 0, int r = n - 1)
-{
-    if(l == r)
-    {
-        seg[idx] = arr[l];
+void build(vector<int> &arr, int idx = 0, int l = 0, int r = n - 1) {
+    if(l == r) {
+        segtree[idx] = arr[l];
         return;
     }
-    int lc = (idx << 1) + 1, rc = lc + 1, m = l + ((r - l) >> 1);
-    build(lc, l, m);
-    build(rc, m + 1, r);
-    seg[idx] = seg[lc] + seg[rc];
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    int mid = (l + r) / 2;
+    build(arr, lc, l, mid);
+    build(arr, rc, mid+1, r);
+    segtree[idx] = segtree[lc] + segtree[rc];
 }
 
-void update(int u, int v, int idx = 0, int l = 0, int r = n - 1)
-{
-    if(u < l || u > r)
-    {
+void update(int a, int val, int idx = 0, int l = 0, int r = n - 1) {
+    if (r < a || a < l) return;
+    if (a == l && r == a) {
+        if(val == 0)
+            segtree[idx] = val;
+        else 
+            segtree[idx] += val;
         return;
     }
-    if(u == l && u == r)
-    {
-        seg[idx] += v;
-        return;
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    int mid = (l + r) / 2;
+    if(a <= mid) {
+        update(a, val, lc, l, mid);
     }
-    int lc = (idx << 1) + 1, rc = lc + 1, m = l + ((r - l) >> 1);
-    if(u <= m)
-    {
-        update(u, v, lc, l, m);
+    else {
+        update(a, val, rc, mid+1, r);
     }
-    else
-    {
-        update(u, v, rc, m + 1, r);
-    }
-    seg[idx] = seg[lc] + seg[rc];
+    segtree[idx] = segtree[lc] + segtree[rc];
 }
 
-int query(int u, int v, int idx = 0, int l = 0, int r = n - 1)
-{
-    if(u > r || v < l)
-    {
-        return 0;
-    }
-    if(u <= l && v >= r)
-    {
-        return seg[idx];
-    }
-    int lc = (idx << 1) + 1, rc = lc + 1, m = l + ((r - l) >> 1);
-    return query(u, v, lc, l, m) + query(u, v, rc, m + 1, r);
+int query(int a, int b, int idx = 0, int l = 0, int r = n - 1) {
+    if (r < a || b < l) return 0;
+    if (a <= l && r <= b) return segtree[idx];
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    int mid = (l + r) / 2;
+    return query(a, b, lc, l, mid) + query(a, b, rc, mid+1, r);
 }
