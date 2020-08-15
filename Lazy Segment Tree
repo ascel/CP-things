@@ -54,6 +54,5 @@ ll query(int a, int b, int idx = 0, int l = 0, int r = n - 1) {
     int rc = lc + 1;
     int mid = (l + r) / 2;
     ll res = query(a, b, lc, l, mid) + query(a, b, rc, mid+1, r);
-    // cout << idx << ' ' << res << '\n';
     return res;
 }
