@@ -17,10 +17,7 @@ void build(vector<int> &arr, int idx = 0, int l = 0, int r = n - 1) {
 void update(int a, int val, int idx = 0, int l = 0, int r = n - 1) {
     if (r < a || a < l) return;
     if (a == l && r == a) {
-        if(val == 0)
-            segtree[idx] = val;
-        else 
-            segtree[idx] += val;
+        segtree[idx] += val;
         return;
     }
     int lc = (idx << 1) + 1;
