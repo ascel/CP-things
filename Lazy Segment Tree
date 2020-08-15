@@ -1,0 +1,59 @@
+int MAXN, n;
+vector<ll> segtree, lazy, len;
+
+void push(int idx) {
+    if(lazy[idx] == 0) return;
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    lazy[lc] += lazy[idx];
+    lazy[rc] += lazy[idx];
+    segtree[lc] += lazy[idx] * len[lc];
+    segtree[rc] += lazy[idx] * len[rc];
+    lazy[idx] = 0;
+}
+
+void build(vector<int> &arr, int idx = 0, int l = 0, int r = n - 1) {
+    len[idx] = r-l+1;
+    if(l == r) {
+        segtree[idx] = arr[l];
+        return;
+    }
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    int mid = (l + r) / 2;
+    build(arr, lc, l, mid);
+    build(arr, rc, mid+1, r);
+    segtree[idx] = segtree[lc] + segtree[rc];
+}
+
+void update(int a, int b, int val, int idx = 0, int l = 0, int r = n - 1) {
+    if (r < a || b < l) return;
+    if (a <= l && r <= b) {
+        segtree[idx] += val * len[idx];
+        lazy[idx] += val;
+        return;
+    }
+    push(idx);
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    int mid = (l + r) / 2;
+
+    if(a <= mid) update(a, b, val, lc, l, mid);
+    if(b > mid) update(a, b, val, rc, mid+1, r);
+    
+    segtree[idx] = segtree[lc] + segtree[rc];
+
+    return;
+}
+
+ll query(int a, int b, int idx = 0, int l = 0, int r = n - 1) {
+    if (r < a || b < l) return 0;
+    if (a <= l && r <= b) return segtree[idx];
+    push(idx);
+    int lc = (idx << 1) + 1;
+    int rc = lc + 1;
+    int mid = (l + r) / 2;
+    ll res = query(a, b, lc, l, mid) + query(a, b, rc, mid+1, r);
+    // cout << idx << ' ' << res << '\n';
+    return res;
+}
